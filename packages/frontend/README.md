@@ -1,0 +1,1 @@
+> Access to fetch at 'https://github.com/login/oauth/access_token' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
