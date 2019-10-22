@@ -1,60 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button, FormGroup, Label, Col, Input, Container } from 'reactstrap';
 import * as querystring from 'querystring';
 import './bootstrap.min.css';
-
-const fetchAccessToken = async (
-  setAccessToken: (accessToken: string) => void,
-) => {
-  const search = window.location.search;
-  if (!search) {
-    console.log('1');
-    return null;
-  }
-  
-  const codeResponse = querystring.parse(search.substr(1));
-  console.log(codeResponse);
-  if (!codeResponse.code) {
-    console.log('2');
-    return null;
-  }
-
-  const accessTokenResponse = await fetch(
-    'https://github.com/login/oauth/access_token',
-    {
-      method: 'post',
-      body: JSON.stringify({
-        code: codeResponse.code,
-        client_id: process.env.REACT_APP_GITHUB_CLIENT_ID,
-        client_secret: process.env.REACT_APP_GITHUB_CLIENT_SECRET,
-        // redirect_uri: redirectURI,
-      }),
-      headers: {
-        Accept: 'application/json',
-      }
-    }
-  )
-
-  const json = await accessTokenResponse.json();
-
-  setAccessToken(json.access_token);
-};
 
 const App: React.FC = () => {
   const search = window.location.search
     ? querystring.parse(window.location.search.substr(1))
     : {};
   
-  const [redirectURI, setRedirectURI] = useState(window.location.origin);
+  const redirectURI = window.location.origin;
 
   // https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/#non-web-application-flow
   const github = `https://github.com/login/oauth/authorize`;
 
   const githubQS = querystring.stringify({
     client_id: process.env.REACT_APP_GITHUB_CLIENT_ID,
-    redirect_uri: redirectURI,
+    redirect_uri: `${redirectURI}?type=github`,
     scope: 'repo',
     state: 'asdf',
+  })
+
+  const google = `https://accounts.google.com/o/oauth2/v2/auth`;
+
+  const googleQS = querystring.stringify({
+    client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    redirect_uri: `${redirectURI}?type=google`,
+    scope: 'https://www.googleapis.com/auth/calendar.events.readonly',
+    state: 'asdf',
+    response_type: 'code',
   })
 
   return (
@@ -62,6 +35,9 @@ const App: React.FC = () => {
       <Container>
         <Button href={`${github}?${githubQS}`}>
           GitHub
+        </Button>
+        <Button href={`${google}?${googleQS}`}>
+          Google
         </Button>
         <FormGroup row>
           <Label for="accessToken" sm={2}>Access Token</Label>
@@ -75,6 +51,13 @@ const App: React.FC = () => {
           </Col>
         </FormGroup>
         <ul>
+          <li>
+            Google
+            <ul>
+              <li><a href="https://developers.google.com/identity/protocols/OAuth2">Using OAuth 2.0 to Access Google APIs</a></li>
+              <li><a href="https://console.developers.google.com/apis/credentials">APIs & Services: Credentials</a></li>
+            </ul>
+          </li>
           <li>
             <a href="https://github.com/settings/developers">GitHub: OAuth Apps</a>
           </li>
